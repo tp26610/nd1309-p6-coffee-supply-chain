@@ -328,9 +328,18 @@ contract SupplyChain {
   ) 
   {
     // Assign values to the 9 parameters
-  
-    
-  return 
+  Item memory item = items[_upc];
+  itemSKU = item.sku;
+  itemUPC = item.upc;
+  productID = item.productID;
+  productNotes = item.productNotes;
+  productPrice = item.productPrice;
+  itemState = uint(item.itemState);
+  distributorID = item.distributorID;
+  retailerID = item.retailerID;
+  consumerID = item.consumerID;
+
+  return
   (
   itemSKU,
   itemUPC,
