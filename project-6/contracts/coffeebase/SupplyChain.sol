@@ -96,43 +96,43 @@ contract SupplyChain {
 
   // Define a modifier that checks if an item.state of a upc is Processed
   modifier processed(uint _upc) {
-
+    require(items[_upc].itemState == State.Processed);
     _;
   }
-  
+
   // Define a modifier that checks if an item.state of a upc is Packed
   modifier packed(uint _upc) {
-
+    require(items[_upc].itemState == State.Packed);
     _;
   }
 
   // Define a modifier that checks if an item.state of a upc is ForSale
   modifier forSale(uint _upc) {
-
+    require(items[_upc].itemState == State.ForSale);
     _;
   }
 
   // Define a modifier that checks if an item.state of a upc is Sold
   modifier sold(uint _upc) {
-
+    require(items[_upc].itemState == State.Sold);
     _;
   }
   
   // Define a modifier that checks if an item.state of a upc is Shipped
   modifier shipped(uint _upc) {
-
+    require(items[_upc].itemState == State.Shipped);
     _;
   }
 
   // Define a modifier that checks if an item.state of a upc is Received
   modifier received(uint _upc) {
-
+    require(items[_upc].itemState == State.Received);
     _;
   }
 
   // Define a modifier that checks if an item.state of a upc is Purchased
   modifier purchased(uint _upc) {
-    
+    require(items[_upc].itemState == State.Purchased);
     _;
   }
 
@@ -156,21 +156,34 @@ contract SupplyChain {
   function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation, string  _originFarmLatitude, string  _originFarmLongitude, string  _productNotes) public 
   {
     // Add the new item as part of Harvest
-    
+    Item storage item = items[_upc];
+    item.originFarmerID = _originFarmerID;
+    item.originFarmName = _originFarmName;
+    item.originFarmInformation = _originFarmInformation;
+    item.originFarmLatitude = _originFarmLatitude;
+    item.originFarmLongitude = _originFarmLongitude;
+    item.productNotes = _productNotes;
+    item.itemState = State.Harvested;
+    item.sku = sku;
+    item.upc = _upc;
+    item.ownerID = msg.sender;
+
     // Increment sku
     sku = sku + 1;
+
     // Emit the appropriate event
-    
+    emit Harvested(_upc);
   }
 
   // Define a function 'processtItem' that allows a farmer to mark an item 'Processed'
   function processItem(uint _upc) public 
   // Call modifier to check if upc has passed previous supply chain stage
-  
+  harvested(_upc)
   // Call modifier to verify caller of this function
-  
+  verifyCaller(msg.sender)
   {
     // Update the appropriate fields
+    Item storage item = items[_upc];
     
     // Emit the appropriate event
     
@@ -276,6 +289,15 @@ contract SupplyChain {
   ) 
   {
   // Assign values to the 8 parameters
+  Item memory item = items[_upc];
+  itemSKU = item.sku;
+  itemUPC = item.upc;
+  ownerID = item.ownerID;
+  originFarmerID = item.originFarmerID;
+  originFarmName = item.originFarmName;
+  originFarmInformation = item.originFarmInformation;
+  originFarmLatitude = item.originFarmLatitude;
+  originFarmLongitude = item.originFarmLongitude;
   
     
   return 
