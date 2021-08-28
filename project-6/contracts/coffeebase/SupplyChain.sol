@@ -283,13 +283,17 @@ contract SupplyChain {
   // Use the above modifiers to check if the item is received
   function purchaseItem(uint _upc) public 
     // Call modifier to check if upc has passed previous supply chain stage
-    
+    received(_upc)
     // Access Control List enforced by calling Smart Contract / DApp
     {
     // Update the appropriate fields - ownerID, consumerID, itemState
-    
+    Item storage item = items[_upc];
+    item.ownerID = msg.sender;
+    item.consumerID = msg.sender;
+    item.itemState = State.Purchased;
+
     // Emit the appropriate event
-    
+    emit Purchased(_upc);
   }
 
   // Define a function 'fetchItemBufferOne' that fetches the data
