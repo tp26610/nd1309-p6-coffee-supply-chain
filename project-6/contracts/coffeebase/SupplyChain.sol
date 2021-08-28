@@ -163,6 +163,7 @@ contract SupplyChain {
     item.originFarmLatitude = _originFarmLatitude;
     item.originFarmLongitude = _originFarmLongitude;
     item.productNotes = _productNotes;
+    item.productID = _upc + sku;
     item.itemState = State.Harvested;
     item.sku = sku;
     item.upc = _upc;
