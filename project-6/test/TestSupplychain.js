@@ -87,6 +87,9 @@ contract('SupplyChain', function(accounts) {
         const eventTester = new EventTester();
         eventTester.watchEvent(supplyChain.Processed());
 
+        // add a Farmer to SupplyChain
+        await supplyChain.addFarmer(originFarmerID);
+
         // Mark an item as Processed by calling function processtItem()
         await supplyChain.processItem(upc, { from: originFarmerID });
 
@@ -183,6 +186,9 @@ contract('SupplyChain', function(accounts) {
     it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async() => {
         const supplyChain = await SupplyChain.deployed()
 
+        // Add a distributor
+        await supplyChain.addDistributor(distributorID);
+
         // Watch the emitted event Sold()
         const eventTester = new EventTester();
         eventTester.watchEvent(supplyChain.Sold());
@@ -255,11 +261,14 @@ contract('SupplyChain', function(accounts) {
 
         // assert event emitted
         await eventTester.assertEvent('Shipped', { upc: toBigNumber(upc) });
-    })
+    });
 
     // 7th Test
     it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async() => {
         const supplyChain = await SupplyChain.deployed()
+
+        // Add an retailer
+        supplyChain.addRetailer(retailerID);
 
         // Watch the emitted event Received()
         const eventTester = new EventTester();
@@ -292,7 +301,10 @@ contract('SupplyChain', function(accounts) {
 
     // 8th Test
     it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async() => {
-        const supplyChain = await SupplyChain.deployed()
+        const supplyChain = await SupplyChain.deployed();
+
+        // Add a consumer
+        await supplyChain.addConsumer(consumerID);
 
         // Watch the emitted event Received()
         const eventTester = new EventTester();
@@ -321,7 +333,7 @@ contract('SupplyChain', function(accounts) {
 
         // assert itemState is Purchased
         assert.equal(resultBufferTwo[5], 7, 'Error: Invalid item State')
-    })
+    });
 
     // 9th Test
     it("Testing smart contract function fetchItemBufferOne() that allows anyone to fetch item details from blockchain", async() => {
