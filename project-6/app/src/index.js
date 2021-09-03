@@ -22,8 +22,11 @@ const App = {
     consumerID: "0x0000000000000000000000000000000000000000",
 
     init: async function () {
-        App.readForm();
-        await App.initWeb3();
+      console.log('>> init');
+      this.readForm();
+      await App.initWeb3();
+      this.bindEvents();
+      console.log('>> init done');
     },
 
     readForm: function () {
@@ -136,6 +139,7 @@ const App = {
     },
 
     handleButtonClick: async function(event) {
+      console.log('handleButtonClick >> event=', event);
         event.preventDefault();
 
         App.getMetaskAccountID();
@@ -177,31 +181,25 @@ const App = {
             }
     },
 
-    harvestItem: function(event) {
-        event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+    harvestItem: async function(event) {
+      event.preventDefault();
+      var processId = parseInt($(event.target).data('id'));
 
-        App.contracts.SupplyChain.deployed().then(function(instance) {
-            console.log('>> harvest instance=', instance);
-
-            return instance.harvestItem(
-                App.upc, 
-                App.metamaskAccountID, 
-                App.originFarmName, 
-                App.originFarmInformation, 
-                App.originFarmLatitude, 
-                App.originFarmLongitude, 
-                App.productNotes
-            )
-            .then((result) => console.log('>> harvestItem result=', result))
-            .catch(error => console.log('>> harvestItem error=', error))
-            ;
-        }).then(function(result) {
-            $("#ftc-item").text(result);
-            console.log('harvestItem',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
+      const { harvestItem } = this.meta.methods;
+      console.log(`harvestItem >> input is upc=${this.upc}, originFarmerID=${this.metamaskAccountID}, originFarmName=${this.originFarmName}, originFarmInformation=${this.originFarmInformation}, originFarmLatitude=${this.originFarmLatitude}, originFarmLongitude=${this.originFarmLongitude}, productNotes=${this.productNotes}`);
+      try {
+        await harvestItem(
+          App.upc,
+          App.metamaskAccountID,
+          App.originFarmName,
+          App.originFarmInformation,
+          App.originFarmLatitude,
+          App.originFarmLongitude,
+          App.productNotes
+        ).send({ from: this.account });
+      } catch (e) {
+        console.error('harvestItem >> error=', e);
+      }
     },
 
     processItem: function (event) {
