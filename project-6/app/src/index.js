@@ -255,10 +255,10 @@ const App = {
         const productPriceInWei = this.web3.utils.toWei(this.productPriceInEhter, "ether");
         // console.log('buyItem >> walletValue=', walletValue);
         const result = await buyItem(this.upc).send({ from: this.metamaskAccountID, value: productPriceInWei});
-        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        $("#product-details-log").text(JSON.stringify(result, null, 2));
         console.log(`buyItem >> done`);
       } catch (e) {
-        $("#farm-details-log").text(`error: ${e.message}`);
+        $("#product-details-log").text(`error: ${e.message}`);
         console.error('buyItem >> error=', e);
       }
     },
@@ -273,10 +273,10 @@ const App = {
       console.log(`shipItem >> input upc=${this.upc}`);
       try {
         const result = await shipItem(this.upc).send({ from: this.metamaskAccountID });
-        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        $("#product-details-log").text(JSON.stringify(result, null, 2));
         console.log(`shipItem >> done`);
       } catch (e) {
-        $("#farm-details-log").text(`error: ${e.message}`);
+        $("#product-details-log").text(`error: ${e.message}`);
         console.error('shipItem >> error=', e);
       }
     },
@@ -291,28 +291,30 @@ const App = {
       console.log(`receiveItem >> input upc=${this.upc}`);
       try {
         const result = await receiveItem(this.upc).send({ from: this.metamaskAccountID });
-        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        $("#product-details-log").text(JSON.stringify(result, null, 2));
         console.log(`receiveItem >> done`);
       } catch (e) {
-        $("#farm-details-log").text(`error: ${e.message}`);
+        $("#product-details-log").text(`error: ${e.message}`);
         console.error('receiveItem >> error=', e);
       }
     },
 
-    purchaseItem: function (event) {
+    purchaseItem: async function (event) {
       this.readForm();
 
       event.preventDefault();
       var processId = parseInt($(event.target).data('id'));
 
-      App.contracts.SupplyChain.deployed().then(function(instance) {
-          return instance.purchaseItem(App.upc, {from: App.metamaskAccountID});
-      }).then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('purchaseItem',result);
-      }).catch(function(err) {
-          console.log(err.message);
-      });
+      const { purchaseItem } = this.meta.methods;
+      console.log(`purchaseItem >> input upc=${this.upc}`);
+      try {
+        const result = await purchaseItem(this.upc).send({ from: this.metamaskAccountID });
+        $("#product-details-log").text(JSON.stringify(result, null, 2));
+        console.log(`purchaseItem >> done`);
+      } catch (e) {
+        $("#product-details-log").text(`error: ${e.message}`);
+        console.error('purchaseItem >> error=', e);
+      }
     },
 
     fetchItemBufferOne: async function () {
