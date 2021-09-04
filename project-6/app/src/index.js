@@ -171,7 +171,7 @@ const App = {
       const { harvestItem } = this.meta.methods;
       console.log(`harvestItem >> input is upc=${this.upc}, originFarmerID=${this.metamaskAccountID}, originFarmName=${this.originFarmName}, originFarmInformation=${this.originFarmInformation}, originFarmLatitude=${this.originFarmLatitude}, originFarmLongitude=${this.originFarmLongitude}, productNotes=${this.productNotes}`);
       try {
-        await harvestItem(
+        const result = await harvestItem(
           App.upc,
           App.metamaskAccountID,
           App.originFarmName,
@@ -179,28 +179,32 @@ const App = {
           App.originFarmLatitude,
           App.originFarmLongitude,
           App.productNotes
-        ).send();
+        ).send({ from: this.metamaskAccountID});
+        $("#farm-details-log").text(JSON.stringify(result, null, 2));
       } catch (e) {
+        $("#farm-details-log").text(`error: ${e.message}`);
         console.error('harvestItem >> error=', e);
       }
     },
 
-    processItem: function (event) {
+    processItem: async function (event) {
       this.readForm();
 
       event.preventDefault();
       var processId = parseInt($(event.target).data('id'));
 
-      App.contracts.SupplyChain.deployed().then(function(instance) {
-          return instance.processItem(App.upc, {from: App.metamaskAccountID});
-      }).then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('processItem',result);
-      }).catch(function(err) {
-          console.log(err.message);
-      });
+      const { processItem } = this.meta.methods;
+      console.log(`processItem >> input upc=${this.upc}`);
+      try {
+        const result = await processItem(this.upc).send({ from: this.metamaskAccountID});
+        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        console.log(`processItem >> done`);
+      } catch (e) {
+        $("#farm-details-log").text(`error: ${e.message}`);
+        console.error('processItem >> error=', e);
+      }
     },
-    
+
     packItem: function (event) {
       this.readForm();
     
@@ -311,7 +315,7 @@ const App = {
         const result = await fetchItemBufferOne(this.upc).call();
         console.log('fetchItemBufferOne done >> result=', result);
 
-        $("#ftc-item").text(JSON.stringify(result, null, 2));
+        $("#product-overview-log").text(JSON.stringify(result, null, 2));
         return result;
       } catch (error) {
         console.log('fetchItemBufferOne error >> error=', error);
@@ -329,7 +333,7 @@ const App = {
         const result = await fetchItemBufferTwo(this.upc).call();
         console.log('fetchItemBufferTwo done >> result=', result);
 
-        $("#ftc-item").text(JSON.stringify(result, null, 2));
+        $("#product-overview-log").text(JSON.stringify(result, null, 2));
         return result;
       } catch (error) {
         console.log('fetchItemBufferTwo error >> error=', error);
