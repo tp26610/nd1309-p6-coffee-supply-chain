@@ -243,21 +243,24 @@ const App = {
       }
     },
 
-    buyItem: function (event) {
+    buyItem: async function (event) {
       this.readForm();
 
       event.preventDefault();
       var processId = parseInt($(event.target).data('id'));
 
-      App.contracts.SupplyChain.deployed().then(function(instance) {
-          const walletValue = this.web3.toWei(3, "ether");
-          return instance.buyItem(App.upc, {from: App.metamaskAccountID, value: walletValue});
-      }).then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('buyItem',result);
-      }).catch(function(err) {
-          console.log(err.message);
-      });
+      const { buyItem } = this.meta.methods;
+      console.log(`buyItem >> input upc=${this.upc}`);
+      try {
+        const productPriceInWei = this.web3.utils.toWei(this.productPriceInEhter, "ether");
+        // console.log('buyItem >> walletValue=', walletValue);
+        const result = await buyItem(this.upc).send({ from: this.metamaskAccountID, value: productPriceInWei});
+        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        console.log(`buyItem >> done`);
+      } catch (e) {
+        $("#farm-details-log").text(`error: ${e.message}`);
+        console.error('buyItem >> error=', e);
+      }
     },
 
     shipItem: function (event) {
