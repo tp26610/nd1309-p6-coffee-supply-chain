@@ -281,20 +281,22 @@ const App = {
       }
     },
 
-    receiveItem: function (event) {
+    receiveItem: async function (event) {
       this.readForm();
 
       event.preventDefault();
       var processId = parseInt($(event.target).data('id'));
 
-      App.contracts.SupplyChain.deployed().then(function(instance) {
-          return instance.receiveItem(App.upc, {from: App.metamaskAccountID});
-      }).then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('receiveItem',result);
-      }).catch(function(err) {
-          console.log(err.message);
-      });
+      const { receiveItem } = this.meta.methods;
+      console.log(`receiveItem >> input upc=${this.upc}`);
+      try {
+        const result = await receiveItem(this.upc).send({ from: this.metamaskAccountID });
+        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        console.log(`receiveItem >> done`);
+      } catch (e) {
+        $("#farm-details-log").text(`error: ${e.message}`);
+        console.error('receiveItem >> error=', e);
+      }
     },
 
     purchaseItem: function (event) {
