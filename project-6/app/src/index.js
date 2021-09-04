@@ -111,6 +111,9 @@ const App = {
         const accounts = await this.web3.eth.getAccounts();
         this.account = accounts[0];
         console.log('initSupplyChain >> this.account=', this.account);
+
+        // subscribe events
+        App.fetchEvents();
       } catch (error) {
         console.error('Could not connect to contract or chain. error=', error);
       }
@@ -122,45 +125,45 @@ const App = {
 
     handleButtonClick: async function(event) {
       console.log('handleButtonClick >> event=', event);
-        event.preventDefault();
+      event.preventDefault();
 
-        App.getMetaskAccountID();
+      App.getMetaskAccountID();
 
-        var processId = parseInt($(event.target).data('id'));
-        console.log('processId',processId);
+      var processId = parseInt($(event.target).data('id'));
+      console.log('handleButtonClick >> processId=', processId);
 
-        switch(processId) {
-            case 1:
-                return await App.harvestItem(event);
-                break;
-            case 2:
-                return await App.processItem(event);
-                break;
-            case 3:
-                return await App.packItem(event);
-                break;
-            case 4:
-                return await App.sellItem(event);
-                break;
-            case 5:
-                return await App.buyItem(event);
-                break;
-            case 6:
-                return await App.shipItem(event);
-                break;
-            case 7:
-                return await App.receiveItem(event);
-                break;
-            case 8:
-                return await App.purchaseItem(event);
-                break;
-            case 9:
-                return await App.fetchItemBufferOne(event);
-                break;
-            case 10:
-                return await App.fetchItemBufferTwo(event);
-                break;
-            }
+      switch(processId) {
+        case 1:
+          await App.harvestItem(event);
+          break;
+        case 2:
+          await App.processItem(event);
+          break;
+        case 3:
+          await App.packItem(event);
+          break;
+        case 4:
+          await App.sellItem(event);
+          break;
+        case 5:
+          await App.buyItem(event);
+          break;
+        case 6:
+          await App.shipItem(event);
+          break;
+        case 7:
+          await App.receiveItem(event);
+          break;
+        case 8:
+          await App.purchaseItem(event);
+          break;
+        case 9:
+          await App.fetchItemBufferOne(event);
+          break;
+        case 10:
+          await App.fetchItemBufferTwo(event);
+          break;
+      }
     },
 
     harvestItem: async function(event) {
@@ -354,24 +357,11 @@ const App = {
       }
     },
 
-    fetchEvents: function () {
-        if (typeof App.contracts.SupplyChain.currentProvider.sendAsync !== "function") {
-            App.contracts.SupplyChain.currentProvider.sendAsync = function () {
-                return App.contracts.SupplyChain.currentProvider.send.apply(
-                App.contracts.SupplyChain.currentProvider,
-                    arguments
-              );
-            };
-        }
-
-        App.contracts.SupplyChain.deployed().then(function(instance) {
-        var events = instance.allEvents(function(err, log){
-          if (!err)
-            $("#ftc-events").append('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
-        });
-        }).catch(function(err) {
-          console.log(err.message);
-        });
+    fetchEvents: async function () {
+      this.meta.events.allEvents((err, event) => {
+        console.log('fetchEvents result >> event=', event);
+        if (!err) $("#ftc-events").append('<li>' + event.event + ' - ' + event.transactionHash + '</li>');
+      });
     }
 };
 
