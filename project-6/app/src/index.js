@@ -114,24 +114,6 @@ const App = {
       } catch (error) {
         console.error('Could not connect to contract or chain. error=', error);
       }
-
-        // /// Source the truffle compiled smart contracts
-        // var jsonSupplyChain='../../build/contracts/SupplyChain.json';
-        
-        // /// JSONfy the smart contracts
-        // $.getJSON(jsonSupplyChain, function(data) {
-        //     console.log('data',data);
-        //     var SupplyChainArtifact = data;
-        //     App.contracts.SupplyChain = TruffleContract(SupplyChainArtifact);
-        //     App.contracts.SupplyChain.setProvider(App.web3Provider);
-            
-        //     App.fetchItemBufferOne();
-        //     App.fetchItemBufferTwo();
-        //     App.fetchEvents();
-
-        // });
-
-        // return App.bindEvents();
     },
 
     bindEvents: function() {
@@ -196,7 +178,7 @@ const App = {
           App.originFarmLatitude,
           App.originFarmLongitude,
           App.productNotes
-        ).send({ from: this.account });
+        ).send();
       } catch (e) {
         console.error('harvestItem >> error=', e);
       }
@@ -303,20 +285,22 @@ const App = {
         });
     },
 
-    fetchItemBufferOne: function () {
-    ///   event.preventDefault();
-    ///    var processId = parseInt($(event.target).data('id'));
-        App.upc = $('#upc').val();
-        console.log('upc',App.upc);
+    fetchItemBufferOne: async function () {
+      this.upc = $('#upc').val();
+      console.log('fetchItemBufferOne >> upc=',this.upc);
 
-        App.contracts.SupplyChain.deployed().then(function(instance) {
-          return instance.fetchItemBufferOne(App.upc);
-        }).then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('fetchItemBufferOne', result);
-        }).catch(function(err) {
-          console.log(err.message);
-        });
+      const { fetchItemBufferOne } = this.meta.methods;
+
+      try {
+        const result = await fetchItemBufferOne(this.upc).call();
+        console.log('fetchItemBufferOne done >> result=', result);
+
+        $("#ftc-item").text(JSON.stringify(result, null, 2));
+        return result;
+      } catch (error) {
+        console.log('fetchItemBufferOne error >> error=', error);
+        throw error;
+      }
     },
 
     fetchItemBufferTwo: function () {
