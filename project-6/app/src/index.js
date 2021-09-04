@@ -16,7 +16,7 @@ const App = {
     originFarmLatitude: null,
     originFarmLongitude: null,
     productNotes: null,
-    productPrice: 0,
+    productPriceInEhter: '0',
     distributorID: "0x0000000000000000000000000000000000000000",
     retailerID: "0x0000000000000000000000000000000000000000",
     consumerID: "0x0000000000000000000000000000000000000000",
@@ -39,7 +39,7 @@ const App = {
         App.originFarmLatitude = $("#originFarmLatitude").val();
         App.originFarmLongitude = $("#originFarmLongitude").val();
         App.productNotes = $("#productNotes").val();
-        App.productPrice = $("#productPrice").val();
+        App.productPriceInEhter = $("#productPrice").val();
         App.distributorID = $("#distributorID").val();
         App.retailerID = $("#retailerID").val();
         App.consumerID = $("#consumerID").val();
@@ -223,22 +223,24 @@ const App = {
       }
     },
 
-    sellItem: function (event) {
+    sellItem: async function (event) {
       this.readForm();
 
       event.preventDefault();
       var processId = parseInt($(event.target).data('id'));
 
-      App.contracts.SupplyChain.deployed().then(function(instance) {
-          const productPrice = this.web3.toWei(1, "ether");
-          console.log('productPrice',productPrice);
-          return instance.sellItem(App.upc, App.productPrice, {from: App.metamaskAccountID});
-      }).then(function(result) {
-          $("#ftc-item").text(result);
-          console.log('sellItem',result);
-      }).catch(function(err) {
-          console.log(err.message);
-      });
+      const { sellItem } = this.meta.methods;
+      console.log(`sellItem >> input upc=${this.upc} productPriceInEhter=${this.productPriceInEhter} ether`);
+      try {
+        const productPriceInWei = this.web3.utils.toWei(this.productPriceInEhter, "ether");
+        console.log('sellItem >> productPriceInWei',productPriceInWei, ' type=', typeof productPriceInWei);
+        const result = await sellItem(this.upc, productPriceInWei).send({ from: this.metamaskAccountID});
+        $("#farm-details-log").text(JSON.stringify(result, null, 2));
+        console.log(`sellItem >> done`);
+      } catch (e) {
+        $("#farm-details-log").text(`error: ${e.message}`);
+        console.error('sellItem >> error=', e);
+      }
     },
 
     buyItem: function (event) {
