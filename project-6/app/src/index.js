@@ -319,17 +319,22 @@ const App = {
       }
     },
 
-    fetchItemBufferTwo: function () {
+    fetchItemBufferTwo: async function () {
       this.readForm();
+      console.log('fetchItemBufferTwo >> upc=',this.upc);
 
-      App.contracts.SupplyChain.deployed().then(function(instance) {
-        return instance.fetchItemBufferTwo.call(App.upc);
-      }).then(function(result) {
-        $("#ftc-item").text(result);
-        console.log('fetchItemBufferTwo', result);
-      }).catch(function(err) {
-        console.log(err.message);
-      });
+      const { fetchItemBufferTwo } = this.meta.methods;
+
+      try {
+        const result = await fetchItemBufferTwo(this.upc).call();
+        console.log('fetchItemBufferTwo done >> result=', result);
+
+        $("#ftc-item").text(JSON.stringify(result, null, 2));
+        return result;
+      } catch (error) {
+        console.log('fetchItemBufferTwo error >> error=', error);
+        throw error;
+      }
     },
 
     fetchEvents: function () {
