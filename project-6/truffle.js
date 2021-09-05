@@ -11,7 +11,7 @@ module.exports = {
     },
     rinkeby: {
       provider: () => {
-        const mnemonic = fs.readFileSync(".secret").toString().trim();
+        const mnemonic = fs.readFileSync(`${__dirname}/.secret`).toString().trim();
         return new HDWalletProvider(mnemonic, `https://rinkeby.infura.io/v3/${infuraKey}`)
       },
       network_id: 4,       // rinkeby's id
