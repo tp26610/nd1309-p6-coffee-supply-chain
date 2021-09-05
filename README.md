@@ -1,5 +1,5 @@
 # Set up Ganachi
-Refer original [README.md - Get Started section](README-default.md#getting-started) to setup Ganachi to run private block chain in local computer.
+Refer original [README.md - Get Started section](README-default.md#getting-started) to setup Ganachi to run private blockchain in local computer.
 
 # Smart Contract in Rinkeby testnet
 The contract is deployed with address `0x27D8D15CbC94527cAdf5eC14B69519aE23288B95` in Rinkeby testnet.
